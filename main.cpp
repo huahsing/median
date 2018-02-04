@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <ctime>
 using namespace std;
 
 int main() {
@@ -9,6 +10,7 @@ int main() {
   int check = 1;
   int answers[TC];
   int j=0;
+  clock_t t = clock();
   
   while (check <= TC) {
     int num; 
@@ -33,11 +35,11 @@ int main() {
     answers[j++] = sum;
     check++;
   }
-  
+  t = clock() - t;
   for (int k=0; k<TC; k++) {
     cout << answers[k] << endl;
   }
-  
+  cout << "Number of ticks to execute loops = " << t << endl;
   return 0;
   
 }
