@@ -8,7 +8,7 @@ int main() {
   int TC;
   cin >> TC; 
   int check = 1;
-  int answers[TC];
+  unsigned long long int answers[TC];
   int j=0;
   clock_t t = clock();
   
@@ -17,7 +17,7 @@ int main() {
     cin >> num; 
     long int arr[num];
     vector <long int> values;
-    long int sum=0;
+    unsigned long long int sum=0;
     for (int i=0; i<num; i++) {
       cin >> arr[i];
       values.push_back(arr[i]);
@@ -36,10 +36,12 @@ int main() {
     check++;
   }
   t = clock() - t;
+  double elapsed_secs = double(t) / CLOCKS_PER_SEC;
   for (int k=0; k<TC; k++) {
     cout << answers[k] << endl;
   }
-  cout << "Number of ticks to execute loops = " << t << endl;
+  cout << "Number of ticks to execute loops = " << t << ", (" << elapsed_secs << " seconds)" << endl;
+  
   return 0;
   
 }
