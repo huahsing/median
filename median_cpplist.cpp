@@ -5,7 +5,7 @@
 unsigned long int MedianList::insert(unsigned long int value)
 {
 #if ENABLE_DEBUG
-    cout << "debug: inserting " << value << endl;
+    cout << "====================\ndebug: inserting " << value << endl;
 #endif
 
     if(iList.size() > 0)
