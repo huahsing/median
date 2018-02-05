@@ -175,8 +175,9 @@ int main()
     }
     
     t = clock() - t;
+    double elapsed_secs = double(t) / CLOCKS_PER_SEC;
     for(int i = 0; i < TC; i++) cout << answers[i] << endl;
-    cout << "Number of ticks to execute loops = " << t << endl;
+    cout << "Number of ticks to execute loops = " << t << ", (" << elapsed_secs << " seconds)" << endl;
     
     // cleanup
     delete [] answers;
