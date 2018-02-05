@@ -67,7 +67,7 @@ I_prompt:
 	
 	// generate test file, if rand48 libraries exist, use them as RAND_MAX is up till 2^31-1
 #ifdef _RAND48_H_
-    srand48(time(NULL)); cout << "hahaha" << endl;
+    srand48(time(NULL));
 #else
     srand(time(NULL));
 #endif
