@@ -17,6 +17,8 @@
 #include "median_cpplist.h"
 #endif
 
-
+#ifdef CPP_LIST2
+#include "median_cpplist2.h"
+#endif
 
 #endif // __MEDIAN_LIST_H_
