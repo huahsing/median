@@ -21,4 +21,8 @@
 #include "median_cpplist2.h"
 #endif
 
+#ifdef CPP_VECTOR
+#include "median_cppvector.h"
+#endif
+
 #endif // __MEDIAN_LIST_H_
