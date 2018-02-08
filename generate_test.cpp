@@ -22,7 +22,7 @@ TC_prompt:
 N_prompt:
 	cout << "Enter value for N (1=<TC=<3000)" << endl;
 	cin >> N;
-	if(N < 1 || N > 3000) { cout << "value not in range" << endl; goto N_prompt; }
+	if(N < 1 || N > 100000) { cout << "value not in range" << endl; goto N_prompt; }
 I_prompt:
     cout << "Enter largest value for each integer (10=<i=<10^9) (enter '0' for default=10^9)" << endl;
     cin >> i_resolution;
