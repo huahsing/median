@@ -8,12 +8,7 @@ using namespace std;
 class MedianList
 {
 private:
-	unsigned long int *higherHeap; // min-ordered heap
-    unsigned long int *lowerHeap; // max-ordered heap
-    int k; // size, ie. number of elements
-    int inputCnt; // track number of inputs so far, max = N
-    int capacity; // (max(size) + 1) where max(size)=maxN/2 + 1 --> = maxN/2 + 2
-    unsigned long int lastDiscardedSmallestValue;
+	
 
 #if ENABLE_DEBUG
     unsigned long int curMedianVal;
@@ -29,8 +24,8 @@ private:
 
 public:
     MedianList(int maxN);
-    virtual ~MedianList() { delete [] heap; }
-    inline void clear() { k = 0; inputCnt = 0; lastDiscardedSmallestValue = 0; }
+    ~MedianList();
+    inline void clear() {  }
     
     unsigned long int insert(unsigned long int value);
     
