@@ -1,1 +1,1 @@
-g++ -DPARTIAL_HEAP median_main.cpp median_partialheap.cpp -o mheap
+g++ -DMY_HEAP median_main.cpp median_heap.cpp -o mheap

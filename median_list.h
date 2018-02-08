@@ -25,8 +25,8 @@
 #include "median_cppvector.h"
 #endif
 
-#ifdef PARTIAL_HEAP
-#include "median_partialheap.h"
+#ifdef MY_HEAP
+#include "median_heap.h"
 #endif
 
 #endif // __MEDIAN_LIST_H_
