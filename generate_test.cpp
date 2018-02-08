@@ -20,7 +20,7 @@ TC_prompt:
     cin >> TC;
     if(TC < 1 || TC > 100) { cout << "value not in range" << endl; goto TC_prompt; }
 N_prompt:
-	cout << "Enter value for N (1=<TC=<3000)" << endl;
+	cout << "Enter value for N (1=<TC=<100000)" << endl;
 	cin >> N;
 	if(N < 1 || N > 100000) { cout << "value not in range" << endl; goto N_prompt; }
 I_prompt:
