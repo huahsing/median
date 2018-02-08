@@ -5,7 +5,7 @@
 #include <ctime>
 
 // turn on debug ("#define ENABLE_DEBUG 0" to turn off)
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 
 #if ENABLE_DEBUG
     #define PRINT_LIST(x) x.printList()
@@ -23,6 +23,10 @@
 
 #ifdef CPP_VECTOR
 #include "median_cppvector.h"
+#endif
+
+#ifdef PARTIAL_HEAP
+#include "median_partialheap.h"
 #endif
 
 #endif // __MEDIAN_LIST_H_

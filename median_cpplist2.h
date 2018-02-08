@@ -23,7 +23,7 @@ private:
 #endif
 
 public:
-    MedianList() { pool.assign(3000, 0); }
+    MedianList(int maxN) { pool.assign(maxN, 0); }
     inline void clear() { pool.splice(pool.end(), iList); }
     
     // insert a value while keeping the list sorted and return the current median after the operation

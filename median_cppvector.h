@@ -21,7 +21,7 @@ private:
     unsigned long int getMedian();
 
 public:
-    MedianList() { iVec.reserve(3000); } // preallocate the vector
+    MedianList(int maxN) { iVec.reserve(maxN); } // preallocate the vector
     inline void clear() { iVec.clear(); }
     
     // insert a value while keeping the list sorted and return the current median after the operation

@@ -21,6 +21,7 @@ private:
 #endif
 
 public:
+    MedianList(int maxN) {}
     inline void clear() { iList.clear(); }
     
     // insert a value while keeping the list sorted and return the current median after the operation

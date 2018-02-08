@@ -19,7 +19,7 @@ int main()
      */
     unsigned long long int *answers = new unsigned long long int[TC];
     
-    MedianList mList;
+    MedianList mList(100000);
     unsigned long long int continuousMedian;
     unsigned long int ith_input;
     
@@ -28,6 +28,9 @@ int main()
     
     for(int i = 0; i < TC; i++)
     {
+#if ENABLE_DEBUG
+        cout << "~*~*~*~*~*~*~*~*~*~*~*~---===> TC " << (i+1) << endl;
+#endif
         cin >> N;
         
         // reset list and continuousMedianfor each test case
