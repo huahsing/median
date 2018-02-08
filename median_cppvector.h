@@ -18,6 +18,7 @@ private:
 #endif
 
     int findPos(unsigned long int value);
+    unsigned long int getMedian();
 
 public:
     MedianList() { iVec.reserve(3000); } // preallocate the vector

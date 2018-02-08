@@ -24,6 +24,27 @@ int MedianList::findPos(unsigned long int value)
     return m;
 }
 
+
+#if USE_PARTIAL_SORT
+#include <algorithm>
+
+// this version performs partial sort after every insertion
+unsigned long int MedianList::insert(unsigned long int value)
+{
+#if ENABLE_DEBUG
+    cout << "====================\ndebug: inserting " << value << endl;
+#endif
+    
+    iVec.push_back(value);
+    int k = iVec.size() / 2 + 1;
+    partial_sort(iVec.begin(), iVec.begin()+k, iVec.end());
+    
+    return getMedian();
+}
+
+#else
+
+// this version uses binary search to find the index for insertion
 unsigned long int MedianList::insert(unsigned long int value)
 {
 #if ENABLE_DEBUG
@@ -35,6 +56,13 @@ unsigned long int MedianList::insert(unsigned long int value)
     advance(insertIter, insertPos);
     iVec.insert(insertIter, value);
     
+    return getMedian();
+}
+
+#endif
+
+unsigned long int MedianList::getMedian()
+{
     int medianIdx = iVec.size() / 2;
     
     if(iVec.size() % 2 == 0) 
@@ -53,6 +81,7 @@ unsigned long int MedianList::insert(unsigned long int value)
         return iVec.at(medianIdx);
     }
 }
+
 
 
 #endif
