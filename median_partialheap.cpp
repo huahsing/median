@@ -11,7 +11,7 @@ MedianList::MedianList(int maxN)
 }
 
 // helper function to compute current median
-unsigned long int MedianList::MedianList::getMedian()
+unsigned long int MedianList::getMedian()
 {
     unsigned long int curMedian;
     

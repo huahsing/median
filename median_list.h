@@ -5,7 +5,7 @@
 #include <ctime>
 
 // turn on debug ("#define ENABLE_DEBUG 0" to turn off)
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 
 #if ENABLE_DEBUG
     #define PRINT_LIST(x) x.printList()

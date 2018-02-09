@@ -1,33 +1,173 @@
 #include "median_list.h"
-#include <cassert>
+
+
+//////////////////////////////////////////////////////////////////////
+//
+//                   H E A P   M E T H O D S
+//
+//////////////////////////////////////////////////////////////////////
+
+// ctor
+Heap::Heap(int capacity, HEAP_ORDER_TYPE order)
+{
+    this->capacity = capacity + 1; // index 0 unused
+    this->order = order;
+    pHeapArr = new unsigned long int [capacity];
+    this->size = 0;
+}
+
+// dtor
+Heap::~Heap() { delete [] pHeapArr; }
+
+// private helper to check whether we should swap, which will depend on the kind of heap we are, returns true if we should swap
+bool Heap::checkSwap(unsigned long int childVal, unsigned long int parentVal)
+{
+    if(order == MAX_ORDER)
+        return (childVal > parentVal);
+    else
+        return (childVal < parentVal);
+}
+
+// after root is deleted, 'value' is the lowest rightmost value to be re-inserted using top-down traversal 
+// this is to maintain heap ordering property (ITERATIVE VERSION)
+void Heap::fixHeapAfterRootDeleted(unsigned long int *pheapArr, unsigned long int value)
+{
+    int rootOfSubHeap=1, childOfSubHeap=2; // childOfSubHeap = 2 --> start with left child of root
+    
+    while(childOfSubHeap <= size)
+    {
+        if(order == MAX_ORDER)
+        {
+            if(childOfSubHeap < size && pheapArr[childOfSubHeap] < pheapArr[childOfSubHeap+1])
+                ++childOfSubHeap;
+        
+            // we should insert value into current root (which is 'empty')
+            if(value >= pheapArr[childOfSubHeap])
+                break; 
+        }
+        else
+        {
+            if(childOfSubHeap < size && pheapArr[childOfSubHeap] > pheapArr[childOfSubHeap+1])
+                ++childOfSubHeap;
+            
+            if(value <= pheapArr[childOfSubHeap])
+                break; 
+        }
+            
+        // move value of larger/smaller child into current root (so now, child is 'empty' and will become new root in next loop)
+        pheapArr[rootOfSubHeap] = pheapArr[childOfSubHeap]; 
+        
+        // move down before looping again
+        rootOfSubHeap = childOfSubHeap;
+        childOfSubHeap = rootOfSubHeap * 2;
+    }
+    
+    // we found the place to insert the new value
+    pheapArr[rootOfSubHeap] = value;
+}
+
+// child is newly inserted index, swap upward until binary heap order is maintained (ITERATIVE VERSION)
+void Heap::percolateUp(int child)
+{
+    unsigned long int swap;
+    
+    for(int parent = child/2; parent >= 1; child /= 2, parent /= 2)
+    {
+        if(checkSwap(pHeapArr[child], pHeapArr[parent]))
+        {
+            swap = pHeapArr[parent];
+            pHeapArr[parent] = pHeapArr[child];
+            pHeapArr[child] = swap;
+        }
+    }
+}
+
+void Heap::insert(unsigned long int value)
+{
+    pHeapArr[size+1] = value;
+    percolateUp(size+1);
+    ++size;
+}
+
+bool Heap::getRootValue(unsigned long int *rootValOut)
+{
+    if(size > 0 && rootValOut)
+    {
+        *rootValOut = pHeapArr[1];
+        return true;
+    }
+    else return false;
+}
+
+bool Heap::deleteRoot(unsigned long int *rootValOut)
+{
+    if(size > 0 && rootValOut)
+    {
+        *rootValOut = pHeapArr[1]; 
+        --size;
+        // remove also lowest rightmost value and send it to fixHeap function to reinsert it (note we reduced the size in previous statement, thus +1 for offset
+        fixHeapAfterRootDeleted(pHeapArr, pHeapArr[size+1]);
+        
+        return true;
+    }
+    else return false;
+}
+
+void Heap::clear() { size = 0; }
+
+int Heap::getSize() { return size; }
+
+
+/********************************************************************/
+
+//////////////////////////////////////////////////////////////////////
+//
+//            M E D I A N   L I S T   M E T H O D S
+//
+//////////////////////////////////////////////////////////////////////
 
 MedianList::MedianList(int maxN)
 {
-    capacity = maxN / 2 + 2; // 1 extra element (index 0 in array not used)
-    heap = new unsigned long int [capacity];
-    k = 0;
-    inputCnt = 0;
-    lastDiscardedSmallestValue = 0;
+    int spaceNeededPerHeap = (maxN+1) / 2;
+    pLowerHalfMaxHeap = new Heap(spaceNeededPerHeap, MAX_ORDER);
+    pHigherHalfMinHeap = new Heap(spaceNeededPerHeap, MIN_ORDER);
+    totalSize = 0;
+}
+
+MedianList::~MedianList()
+{
+    delete pLowerHalfMaxHeap;
+    delete pHigherHalfMinHeap;
+}
+
+void MedianList::clear()
+{
+    pLowerHalfMaxHeap->clear();
+    pHigherHalfMinHeap->clear();
+    totalSize = 0;
 }
 
 // helper function to compute current median
-unsigned long int MedianList::MedianList::getMedian()
+// median(s) are located in root positions of heaps
+unsigned long int MedianList::getMedian()
 {
     unsigned long int curMedian;
     
-    if(inputCnt % 2 == 0)
+    if(totalSize % 2 == 0)
     {
-        unsigned long int largerSubTree;
-        if(inputCnt == 2 || heap[2] >= heap[3])
-            largerSubTree = 2;
-        else
-            largerSubTree = 3;
-        
-        curMedian = (heap[1] + heap[largerSubTree]) / 2;
+        unsigned long int rootVal;
+        pLowerHalfMaxHeap->getRootValue(&rootVal);
+        curMedian = rootVal;
+        pHigherHalfMinHeap->getRootValue(&rootVal);
+        curMedian += rootVal;
+        curMedian /= 2;
     }
     else
     {
-        curMedian = heap[1];
+        if(pLowerHalfMaxHeap->getSize() > pHigherHalfMinHeap->getSize())
+            pLowerHalfMaxHeap->getRootValue(&curMedian);
+        else
+            pHigherHalfMinHeap->getRootValue(&curMedian);
     }
     
 #if ENABLE_DEBUG
@@ -37,106 +177,38 @@ unsigned long int MedianList::MedianList::getMedian()
     return curMedian;
 }
 
-
-#if USE_RECURSION
-// helper to reorderHeap after deletion of root (replacement)
-void MedianList::reorderHeapAfterRootDiscarded(unsigned long int *Heap, int value)
-{
-}
-
-// helper function to percolate up when we need to insert a new element into heap
-void MedianList::percolateUp(int pos)
-{
-}
-#else
-// helper to reorderHeap after deletion of root (replacement)
-void MedianList::reorderHeapAfterRootDiscarded(unsigned long int *Heap, int value)
-{
-    int rootOfSubTree=1, childOfSubTree=2; // childOfSubTree = 2 --> start with left child of root
-    
-    while(childOfSubTree <= k)
-    {
-        if(childOfSubTree < k && Heap[childOfSubTree] < Heap[childOfSubTree+1])
-            ++childOfSubTree;
-        if(value >= Heap[childOfSubTree])
-            break; // we should insert value into current root (which is 'empty')
-            
-        // move value of larger child into current root (so now, child is 'empty' and will become new root in next loop)
-        Heap[rootOfSubTree] = Heap[childOfSubTree]; 
-        
-        // move down before looping again
-        rootOfSubTree = childOfSubTree;
-        childOfSubTree = rootOfSubTree * 2;
-    }
-    
-    // we found the place to insert the new value
-    Heap[rootOfSubTree] = value;
-}
-
-// helper function to percolate up when we need to insert a new element into heap
-void MedianList::percolateUp(int pos)
-{
-    unsigned long int swap;
-    for(int parent = pos/2; parent >= 1; pos /= 2, parent /= 2)
-    {
-        if(heap[pos] > heap[parent])
-        {
-            swap = heap[parent];
-            heap[parent] = heap[pos];
-            heap[pos] = swap;
-        }
-    }
-    
-    // check for valid 'lastDiscardedSmallestValue' first before comparing with root
-    if(lastDiscardedSmallestValue > 0 && heap[1] > lastDiscardedSmallestValue)
-    {
-        // this branch will only happen if the new value inserted percolates all the way up to the root
-        // and is also larger than the lastDiscardedSmallestValue
-        swap = lastDiscardedSmallestValue;
-        lastDiscardedSmallestValue = heap[1];
-        heap[1] = swap;
-    }
-}
-#endif
-
 unsigned long int MedianList::insert(unsigned long int value)
 {
 #if ENABLE_DEBUG
     cout << "====================\ndebug: inserting " << value << endl;
 #endif
 
-    int newK;
-    
-    ++inputCnt;
-    newK = inputCnt/2 + 1;
-    assert(newK <= capacity);
-    
-    if(newK == k) // no new element needed, so we need to discard largest
-    {
-        // note: to successfully enter this branch, k must be >= 2
-        //   if k == 0; then inputCnt must be 1 and thus newK != k
-        //   if k == 1; then inputCnt must be 2 and thus newK != k
-        
-        // if new value less than value at root
-        if(value < heap[1])
-        {
-            // we can overwrite root (as root is largest currently, we need to discard it)
-            lastDiscardedSmallestValue = heap[1];
-            reorderHeapAfterRootDiscarded(heap, value);
-        }
-        else // new value goes into discard pile, but we need to always track lastDiscardedSmallestValue
-        {
-            // replace last discarded value if smaller
-            if(value < lastDiscardedSmallestValue) lastDiscardedSmallestValue = value;
-        }
-    }
+    unsigned long int rootVal;
+
+    if(totalSize == 0) pLowerHalfMaxHeap->insert(value);
     else
     {
-        // we need to insert a new element into the heap
-        k = newK;
-        heap[newK] = value;
-        percolateUp(newK);
+        // check which tree to insert into
+        pLowerHalfMaxHeap->getRootValue(&rootVal);
+        if(value > rootVal)
+            pHigherHalfMinHeap->insert(value);
+        else
+            pLowerHalfMaxHeap->insert(value);
+        
+        // transfer nodes if unbalanced
+        if(pLowerHalfMaxHeap->getSize() - pHigherHalfMinHeap->getSize() >= 2)
+        {
+            pLowerHalfMaxHeap->deleteRoot(&rootVal);
+            pHigherHalfMinHeap->insert(rootVal);
+        }
+        if(pHigherHalfMinHeap->getSize() - pLowerHalfMaxHeap->getSize() >= 2)
+        {
+            pHigherHalfMinHeap->deleteRoot(&rootVal);
+            pLowerHalfMaxHeap->insert(rootVal);
+        }
     }
+    
+    ++totalSize;
     
     return getMedian();
 }
