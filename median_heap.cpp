@@ -79,6 +79,8 @@ void Heap::percolateUp(int child)
             pHeapArr[parent] = pHeapArr[child];
             pHeapArr[child] = swap;
         }
+        else
+            break; // once checkSwap fails, we know whatever's above us is in correct position so break out of loop
     }
 }
 
